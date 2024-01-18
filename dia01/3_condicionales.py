@@ -73,7 +73,21 @@ if sexo == 'Masculino':
     print('no hay ropa')
 else:
   # sexo = 'femenino'
-  if estatura > 1.10 and estatura < 1.49:
+  if estatura > 1.10 and estatura < 1.40:
     print('si hay ropa')
   else:
     print('no hay ropa')
+
+# Operador Ternario
+# condicion que sirve para ejecutarse en una sola linea y en base a la condicion retornara un valor u otro
+nacionalidad = 'ECUATORIANO'
+
+if nacionalidad == 'PERUANO':
+  print('paga 5 soles')
+else:
+  print('paga 8soles')
+
+#  resultado si es verdadero if condicional(es) else resultado si es false
+resultado = 'pague 5 soles' if nacionalidad == 'PERUANO' else 'pague 8 soles'
+
+print(resultado)
