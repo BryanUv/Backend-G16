@@ -1,7 +1,7 @@
 from sqlalchemy import Column, types
 from variables import conexion
 
-class TragoModel(conexion.Model):
+class Trago(conexion.Model):
   # para indicar como se llamara esta tabla en la bd
   __tablename__ = 'tragos'
 
@@ -9,4 +9,4 @@ class TragoModel(conexion.Model):
   nombre = Column(type_=types.Text, nullable=False)
   # server_default > sirve para indicar el valor por defecto en el caso que no se ingrese al momento de hacer 
   # una creacion
-  disponible = Column(type_=types.Boolean, server_default=True)
+  disponible = Column(type_=types.Boolean, server_default='true')
