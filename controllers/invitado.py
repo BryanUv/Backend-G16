@@ -61,11 +61,14 @@ class LoginInvitadoController(Resource):
         },404
       
       print(invitado_encontrado)
-      create_access_token(identity=invitado_encontrado[0])
+      token = create_access_token(identity=invitado_encontrado[0],
+      additional_claims={
+        'tipo':'Invitado'
+      })
 
       return {
         'message':'Bienvenido',
-        'token':''
+        'token':token
       }
     except Exception as e:
       return {
