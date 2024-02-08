@@ -18,4 +18,4 @@ class Pedido(conexion.Model):
   estado = Column(type_=types.Enum(EstadoPedidosEnum))
 
   invitado = Column(ForeignKey(column='invitados.id'), nullable=False, name='invitado_id')
-  barman = Column(ForeignKey(column='barmans.id'), nullable=False, name='barman_id')
+  barman = Column(ForeignKey(column='barmans.id'), name='barman_id')
