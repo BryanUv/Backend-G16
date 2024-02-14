@@ -52,6 +52,9 @@ class PedidosController(Resource):
     
   @validar_barman
   def get(self):
+    """
+    file: controllers/devolverPedidos.yml
+    """
     # devolver los pedidos PERO SOLAMENTE LO PUEDEN V ER LOS BARMANS
     # Crear un DTO para transformar la data al momento de enviarla
     pedidos = conexion.session.query(Pedido).all()

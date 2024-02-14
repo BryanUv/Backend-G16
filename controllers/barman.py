@@ -41,6 +41,9 @@ class BarmanController(Resource):
     
 class LoginController(Resource):
   def post(self):
+    """
+    file: loginBarman.yml
+    """
     dto = LoginBarmanDTO()
     # pasar la informacion del body para ver si es valida o no 
     try:

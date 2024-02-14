@@ -1,4 +1,4 @@
-from sqlalchemy import Column, types, ForeignKey
+from sqlalchemy import Column, types, ForeignKey, orm
 from variables import conexion
 from enum import Enum
 # func son funciones internas de sql
@@ -17,5 +17,9 @@ class Pedido(conexion.Model):
   fecha_creacion = Column(type_=types.DateTime, server_default=func.now(), nullable=False)
   estado = Column(type_=types.Enum(EstadoPedidosEnum), server_default=EstadoPedidosEnum.EN_ESPERA.value)
 
-  invitado = Column(ForeignKey(column='invitados.id'), nullable=False, name='invitado_id')
-  barman = Column(ForeignKey(column='barmans.id'), name='barman_id')
+  invitadoId = Column(ForeignKey(column='invitados.id'), nullable=False, name='invitado_id')
+  barmanId = Column(ForeignKey(column='barmans.id'), name='barman_id')
+
+  # ahora en nuestra invitado se creara un atributo virtual llamado pedidos y a su vez en el pedido podremos
+  # ingresar a toda la instancia del invitado por su atributo invitado (haciendo un inner join)
+  invitado = orm.relationship(argument='Invitado', backref='pedidos')
