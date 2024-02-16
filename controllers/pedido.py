@@ -52,6 +52,10 @@ class PedidosController(Resource):
     
   @validar_barman
   def get(self):
+    # cuando utilizamos un decorador dentro de un metodo y este decorador es un decorador manual lo que sucede
+    # es que se basara en la ubicacion de este decorador (el decorador se encuentra en el nivel mas afuera 
+    # de la aplicacion) entonces toma como punto de referencia esa ubicacion y por lo que al utilizar un 
+    # un archivo de documentacion tenemos que indicarle la carpeta donde se ubicara ese archivo
     """
     file: controllers/devolverPedidos.yml
     """
