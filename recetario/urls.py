@@ -16,10 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from gestion.views import vistaPrueba
+from django.conf.urls.static import static
+# importa todas la variables declaradas en mi archivo setting.py
+from django.conf import settings 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # si queremos agregar un archivo con otras rutas entonces usaremos el metodo include
     path('gestion/', include('gestion.urls'))
-]
+] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+# agregando a unas rutas del proyecto la ruta 'static/' con todo el contenido declarado en media_root en la carpeta 'archivos'
+
