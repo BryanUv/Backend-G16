@@ -19,11 +19,26 @@ from django.urls import path, include
 from django.conf.urls.static import static
 # importa todas la variables declaradas en mi archivo setting.py
 from django.conf import settings 
+# genera mi vista para poder accder a la documentacion
+from drf_yasg.views import get_schema_view 
+from drf_yasg import openapi # es la herramienta que utiliza swagger por detras
+
+swagger_view = get_schema_view(
+    openapi.Info(
+        title='API de Recetario',
+        default_version='v1',
+        description='API para gestionar el uso de un recetario con autenticacion',
+        contact=openapi.Contact(name='Bryan Urquizo',
+                                email='bryanurquiso@gmail.com')
+    ),
+    public=True,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # si queremos agregar un archivo con otras rutas entonces usaremos el metodo include
-    path('gestion/', include('gestion.urls'))
+    path('gestion/', include('gestion.urls')),
+    path('documentacion/', swagger_view.with_ui('swagger', cache_timeout=0))
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 # agregando a unas rutas del proyecto la ruta 'static/' con todo el contenido declarado en media_root en la carpeta 'archivos'
 
