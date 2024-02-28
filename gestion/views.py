@@ -12,6 +12,11 @@ from rest_framework import status
 from os import remove
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+# IsAdminUser > verificara si el usuario que envia la token es un usuario de tipo admin (is_superuser = True) y lo permitira hacer todo
+# IsAuthenticated > verificara si hay una token en la peticion, no interesara que privilegios tenga ese usuario
+# IsAuthenticatedOrReadOnly > si es un get o un options no necesita enviar una token, pero si es un POST, PUT, DELETE si no manda la token no le permitira hacer la operacion
+# AllowAny > permite acceder a los recursos con o sin token
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 
 # Create your views here.
 def vistaPrueba(request):
@@ -40,6 +45,7 @@ def controladorInicial(resquest):
   })
 
 class PlatosController(APIView):
+  permission_classes = [IsAuthenticatedOrReadOnly,]
   def get(self, request):
     # SELECT * from platos
     resultado = Plato.objects.all()
@@ -53,7 +59,12 @@ class PlatosController(APIView):
     })
   
   def post(self, request):
-    print(request.data)
+    # instancia del usuario que esta haciendo la peticion y no hay devolvera none
+    print(request.user)
+    # el metodo pro el cual esta mandando la autorizacion osea la jwt
+    print(request.auth)
+    # agregamos una nueva propiedad a una data que seria el id del cheff
+    request.data['cheffId'] = request.user.id
     serializador = PlatoSerializer(data=request.data)
     # valida si la informacion enviada por el cliente es correcta o no, devolvera un boolean
     validacion = serializador.is_valid()
@@ -71,6 +82,8 @@ class PlatosController(APIView):
       }, status=status.HTTP_400_BAD_REQUEST)
     
 class PlatoController(APIView):
+  permission_classes = [IsAuthenticatedOrReadOnly,]
+
   def get(self, request, id):
     plato_encontrado = Plato.objects.filter(id = id).first()
     if not plato_encontrado:
@@ -130,13 +143,28 @@ class PlatoController(APIView):
     return Response(data=None, status=status.HTTP_204_NO_CONTENT)
   
 class IngredientesController(APIView):
+  permission_classes = [IsAuthenticated]
   def post(self, request):
+    cheff = request.user
     # Validar la data con el serializador creado (IngredienteSerializer) y si es que no es correcta indicar que no lo es con un estado 400
     # Caso contrario crear el ingrediente y retornar el mensaje de exito
     serializador = IngredienteSerializer(data=request.data)
     validacion = serializador.is_valid()
+    # request.data > {descripcion: '100gr de azucar', platoId: 10}
     if validacion:
+      # buscar si el plato le pertenece a este cheff, sino no permitir el guardado
+      # al momento de hacer la validacion con el serializador ya me devuelve el plato
+      plato_encontrado = serializador.validated_data.get('platoId')
+
+      # el plato_encontrado al momento de utilizar su cheffId retorna toda la informacion del cheff y no solo su id
+      if plato_encontrado.cheffId and plato_encontrado.cheffId.id != cheff.id:
+        # el cheff no es el propietario de ese plato
+        return Response(data={
+          'message': 'No tienes acceso para modificar esta receta'
+        }, status=status.HTTP_401_UNAUTHORIZED)
+      
       serializador.save()
+      
       return Response(data={
         'message':'Ingrediente agregado exitosamente',
         'content':serializador.data # nos devovera la inforamcion agregada a la base de datos

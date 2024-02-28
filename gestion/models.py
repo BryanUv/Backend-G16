@@ -10,61 +10,6 @@ tipoPlatoOpciones = [
   ('postre','POSTRE'),
   ('golosinas','GOLOSINA')
 ]
-# Create your models here.
-class Plato(models.Model):
-  # https://docs.djangoproject.com/en/5.0/ref/models/fields/
-  id = models.AutoField(primary_key=True, null=False)
-  nombre = models.TextField(null=False)
-  # width_field y height_field sirven para poder indicar las dimensiones de la imagen pero estas dimensiones
-  #  seran utilizadas si es que vamos a utilizar las templates de django
-  foto = models.ImageField()
-  tipo = models.TextField(choices = tipoPlatoOpciones, 
-                          default = tipoPlatoOpciones[0][0]) #entrada
-
-  class Meta:
-    # https://docs.djangoproject.com/en/5.0/ref/models/options/
-    # sirve para indicar como se llamara la tabla en la base de datos
-    db_table = 'platos'
-
-class Ingrediente(models.Model):
-  id = models.AutoField(primary_key=True, null=False)
-  descripcion = models.TextField(null=False)
-  # para crear una relacion entre dos modelos se usa el ForeignKey
-  # to > sirve para indicar la referencia hacia la tabla con la cual crearemos la relacion
-  # db_column > indica como se va a llamar esta columna en la base de datos
-  # on_delete > indica como se va a comportar cuando se elimine el padre (plato al cual pertenece)
-  # CASCADE > si se elimina el plato, se eliminara todos los ingredientes
-  # PROTECT > evita la eliminacion del plato si tiene ingredientes y lanza un error de tipo protectedError
-  # RESTRICT > evita la eliminacion del plato si tiene ingredientes y lanza un error de tipo restrictedError 
-  #  SET_NULL > permite la eliminacion del plato y le cambia el valor a sus ingredientes a la columna plato_id a NULL (los deja huerfanos)
-  # SET_DEFAULT > permite la eliminacion del plato y cambia el valor de la columna a un valor por defecto
-  # DO_NOTHIN > permite la eliminacion  del plato y no cambia el valor del ingrediente del plato_id generando inconsistencia de datos
-  # related_name > funciona muy similar al relationships de flask y eso significa que creara un atributo virtual en el modelo en el cual 
-  # estemos creando la conexion, en este caso en el modelo PLATO
-  platoId = models.ForeignKey(
-    to=Plato, db_column = 'plato_id', on_delete = models.PROTECT, related_name='ingredientes')
-  
-  class Meta:
-    db_table = 'ingredientes'
-
-class Preparacion(models.Model):
-  id = models.AutoField(primary_key=True, null=False)
-  descripcion = models.TextField(null = False)
-  orden = models.IntegerField(null=False)
-  platoId = models.ForeignKey(
-    to=Plato, db_column='plato_id', on_delete=models.PROTECT, related_name='preparaciones')
-  
-  class Meta:
-    db_table = 'preparaciones'
-    # indicar cual sera el ordenamiento al momento de hacer un select
-    # ['orden'] > indicar que ahora el ordenamiento sera en relacion al orden de manera ascendente
-    # ['-orden'] > indicar que ahora el ordenamiento sera en relacion al orden de manera descendente
-    # el ordering no se da a nivel de b ase de datos, solamente a nivel del backend
-    ordering = ['-orden']
-    # el orden y el plato al cual pertenece esta preparacion jamas se puede repetir
-    # unique_together si se da a nivel de base de datos (se crea la contraint unique en la base de datos)
-    unique_together = [['orden','platoId']]
-
 # sirve para poder indicar como vamos a manejar a nuestro usuario en el proyecto
 class ManejadorUsuario(BaseUserManager):
   def create_superuser(self, nombre, correo, password):
@@ -117,3 +62,59 @@ class Cheff(AbstractBaseUser, PermissionsMixin):
 
   class Meta:
     db_table = 'cheffs'
+
+# Create your models here.
+class Plato(models.Model):
+  # https://docs.djangoproject.com/en/5.0/ref/models/fields/
+  id = models.AutoField(primary_key=True, null=False)
+  nombre = models.TextField(null=False)
+  # width_field y height_field sirven para poder indicar las dimensiones de la imagen pero estas dimensiones
+  #  seran utilizadas si es que vamos a utilizar las templates de django
+  foto = models.ImageField()
+  tipo = models.TextField(choices = tipoPlatoOpciones, 
+                          default = tipoPlatoOpciones[0][0]) #entrada
+  cheffId = models.ForeignKey( to=Cheff, db_column='cheff_id', on_delete=models.RESTRICT, null=True)
+
+  class Meta:
+    # https://docs.djangoproject.com/en/5.0/ref/models/options/
+    # sirve para indicar como se llamara la tabla en la base de datos
+    db_table = 'platos'
+
+class Ingrediente(models.Model):
+  id = models.AutoField(primary_key=True, null=False)
+  descripcion = models.TextField(null=False)
+  # para crear una relacion entre dos modelos se usa el ForeignKey
+  # to > sirve para indicar la referencia hacia la tabla con la cual crearemos la relacion
+  # db_column > indica como se va a llamar esta columna en la base de datos
+  # on_delete > indica como se va a comportar cuando se elimine el padre (plato al cual pertenece)
+  # CASCADE > si se elimina el plato, se eliminara todos los ingredientes
+  # PROTECT > evita la eliminacion del plato si tiene ingredientes y lanza un error de tipo protectedError
+  # RESTRICT > evita la eliminacion del plato si tiene ingredientes y lanza un error de tipo restrictedError 
+  #  SET_NULL > permite la eliminacion del plato y le cambia el valor a sus ingredientes a la columna plato_id a NULL (los deja huerfanos)
+  # SET_DEFAULT > permite la eliminacion del plato y cambia el valor de la columna a un valor por defecto
+  # DO_NOTHIN > permite la eliminacion  del plato y no cambia el valor del ingrediente del plato_id generando inconsistencia de datos
+  # related_name > funciona muy similar al relationships de flask y eso significa que creara un atributo virtual en el modelo en el cual 
+  # estemos creando la conexion, en este caso en el modelo PLATO
+  platoId = models.ForeignKey(
+    to=Plato, db_column = 'plato_id', on_delete = models.PROTECT, related_name='ingredientes')
+  
+  class Meta:
+    db_table = 'ingredientes'
+
+class Preparacion(models.Model):
+  id = models.AutoField(primary_key=True, null=False)
+  descripcion = models.TextField(null = False)
+  orden = models.IntegerField(null=False)
+  platoId = models.ForeignKey(
+    to=Plato, db_column='plato_id', on_delete=models.PROTECT, related_name='preparaciones')
+  
+  class Meta:
+    db_table = 'preparaciones'
+    # indicar cual sera el ordenamiento al momento de hacer un select
+    # ['orden'] > indicar que ahora el ordenamiento sera en relacion al orden de manera ascendente
+    # ['-orden'] > indicar que ahora el ordenamiento sera en relacion al orden de manera descendente
+    # el ordering no se da a nivel de b ase de datos, solamente a nivel del backend
+    ordering = ['-orden']
+    # el orden y el plato al cual pertenece esta preparacion jamas se puede repetir
+    # unique_together si se da a nivel de base de datos (se crea la contraint unique en la base de datos)
+    unique_together = [['orden','platoId']]

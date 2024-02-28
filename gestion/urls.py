@@ -10,6 +10,8 @@ from .views import (mostrarRecetas,
                     crearPreparacion,
                     buscarRecetas,
                     crearCheff)	
+# nos da la validacion y nos devuelve las tokens de access y refresh
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 urlpatterns = [
   path('prueba/', view=vistaPrueba),
@@ -22,4 +24,5 @@ urlpatterns = [
   path('preparacion/', view=crearPreparacion),
   path('buscar-recetas/',view=buscarRecetas),
   path('registro-cheff/', view=crearCheff),
+  path('login/', view=TokenObtainPairView.as_view()),
 ]
