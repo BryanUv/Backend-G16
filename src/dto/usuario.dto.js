@@ -10,3 +10,8 @@ export const registroUsuario = Joi.object({
     .valid(tipoUsuario.ADMIN, tipoUsuario.CLIENTE, tipoUsuario.EMPLEADO)
     .default(tipoUsuario.CLIENTE)
 })
+
+export const loginUsuario = Joi.object({
+  correo: Joi.string().email().required(),
+  password: Joi.string().required()
+})
