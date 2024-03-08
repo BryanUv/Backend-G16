@@ -43,6 +43,7 @@ model Usuario {
   apellido String
   correo   String @unique
   password String
+  tipoUsuario tipoUsuario @default(CLIENTE) @map("tipo_usuario")
 
   direcciones Direcion[]
   pedidos     Pedido[]
@@ -95,4 +96,10 @@ enum EstadoPedido {
   RECIBIDO
   EN_PREPARACION
   COMPLETADO
+}
+
+enum tipoUsuario {
+  ADMIN
+  EMPLEADO
+  CLIENTE
 }

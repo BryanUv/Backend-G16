@@ -1,5 +1,5 @@
-import { conexion } from "../conectores";
-import { crearCategoriaDto } from "../dto/categorias.dto";
+import { conexion } from "../conectores.js";
+import { crearCategoriaDto } from "../dto/categorias.dto.js";
 
 export async function crearCategoria(req, res){
   const validacion = crearCategoriaDto.validate(req.body)
@@ -15,5 +15,14 @@ export async function crearCategoria(req, res){
   return res.status(201).json({
     message: 'Categoria creada exitosamente',
     content: categoriaCreada
+  })
+}
+
+export async function listarCategorias(req, res) {
+  // devolver todas las categorias
+  const categorias = await conexion.categoria.findMany()
+
+  return res.json({
+    content: categorias
   })
 }
